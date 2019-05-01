@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mysql = require('mysql');
+const sequelize = require('sequelize');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
