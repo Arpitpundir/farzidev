@@ -9,7 +9,9 @@ module.exports = function(User, passport) {
 	});
 
 	passport.deserializeUser(function(id, done) {
-		Users.findOne({ id: id }, function (err, user) {
+		Users.findOne({ 
+			where: { id: id } 
+		}).then(function (err, user) {
 			if(err) { return done(err); }
 			done(null, user);
 		});
@@ -22,10 +24,12 @@ module.exports = function(User, passport) {
 			passReqToCallback: true
 		},
 		function(req, email, password, done) {
-			User.findOne({ email: email }, function(err, user) {
-				if(err) return done(err);
+			User.findOne({ 
+				where: { email: email } 
+			}).then(function(user) {
 				if(!user) return done(null);
-				bcrypt.compare(password, user.password, function(res) {
+				bcrypt.compare(password, user.password, function(err, res) {
+					if(err) return done(err);
 					if(res === false) return done(null, false);
 					else {
 						return done(null, user);
@@ -41,7 +45,7 @@ module.exports = function(User, passport) {
 				console.log(err);
 				return res.send({
 					loggedIn: false,
-					status: 'error'
+					status: 'passport authenticate error'
 				});
 			}
 			if(!user) {
@@ -51,10 +55,9 @@ module.exports = function(User, passport) {
 			}
 			req.logIn(user, function(err) {
 				if(err) { 
-					console.log(err);
 					return res.send({
 						loggedIn: false,
-						status: 'error'
+						status: 'req login error'
 					});
 				}
 				console.log(req.session);
