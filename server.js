@@ -37,6 +37,9 @@ sequelize
 	});
 
 const User = require('./app/models/User')(sequelize);
+const Organization = require('./app/models/Organization')(sequelize);
+const Role = require('./app/models/Role')(sequelize);
+const UserOrgRole = require('./app/models/UserOrgRole')(sequelize);
 
 const auth = require('./app/routes/auth')(User, passport);
 app.use('/', auth);
