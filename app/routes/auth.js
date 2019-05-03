@@ -2,14 +2,20 @@ const express = require('express');
 const router = express.Router();
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const jwtAuth = require('passport-jwt');
 
-module.exports = function(User, passport) {
+const JWTStrategy = jwtAuth.Strategy;
+
+const jwtPrivateKey = 'temporary private key #123';
+
+module.exports = function(passport, User, Token) {
 	passport.serializeUser(function(user, done) {
 		done(null, user.id);
 	});
 
 	passport.deserializeUser(function(id, done) {
-		Users.findOne({ 
+		User.findOne({ 
 			where: { id: id } 
 		}).then(function (err, user) {
 			if(err) { return done(err); }
@@ -39,6 +45,20 @@ module.exports = function(User, passport) {
 		}
 	));
 
+	passport.use('jwt-auth', new JWTStrategy({
+		jwtFromRequest: req => req.header('Authorization'),
+		secretOrKey: jwtPrivateKey
+	}, function(payload, done) {
+		console.log(payload);
+		User.findOne({
+			where: { email: payload.email }
+		}).then(user => {
+			console.log(user);
+			if(!user) return done(null, false);
+			return done(null, user);
+		});
+	}));
+
 	router.post('/login', function(req, res, next) {
 		passport.authenticate('local', function(err, user, info) {
 			if(err) {
@@ -53,19 +73,25 @@ module.exports = function(User, passport) {
 					loggedIn: false
 				});
 			}
-			req.logIn(user, function(err) {
-				if(err) { 
-					return res.send({
-						loggedIn: false,
-						status: 'req login error'
-					});
-				}
-				console.log(req.session);
-				return res.status(200).send({
-					loggedIn: true,
-					sessionID: req.sessionID
+
+			const token = jwt.sign({
+				email: user.email
+			}, jwtPrivateKey, (err, token) => {
+				if(err) return res.status(500).send({
+					loggedIn: false,
+					status: 'token generation error'
 				});
-			})
+
+				Token.create({
+					userId: user.id,
+					token: token
+				}).then(tokenInDB => {
+					return res.send({
+						loggedIn: true,
+						token: tokenInDB.token
+					});
+				});
+			});
 		})(req, res, next);
 	});
 

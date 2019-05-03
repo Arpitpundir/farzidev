@@ -3,18 +3,12 @@ const bodyParser = require('body-parser');
 const Sequelize = require('sequelize');
 const config = require('./app/configs/config');
 const passport = require('passport');
-const session = require('express-session');
 
 app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(passport.initialize());
-app.use(session({
-	secret: 'random secret key',
-	resave: false,
-	saveUninitialized: false
-}));
 
 const sequelize = new Sequelize(
 	config.sql.database, 
@@ -40,9 +34,12 @@ const User = require('./app/models/User')(sequelize);
 const Organization = require('./app/models/Organization')(sequelize);
 const Role = require('./app/models/Role')(sequelize);
 const UserOrgRole = require('./app/models/UserOrgRole')(sequelize);
+const Token = require('./app/models/Token')(sequelize);
 
-const auth = require('./app/routes/auth')(User, passport);
+const auth = require('./app/routes/auth')(passport, User, Token);
+const user = require('./app/routes/user')(passport);
 app.use('/', auth);
+app.use('/users', user);
 
 app.listen(8000, function() {
 	console.log('listening on port 8000');
