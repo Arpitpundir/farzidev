@@ -37,9 +37,11 @@ const UserOrgRole = require('./app/models/UserOrgRole')(sequelize);
 const Token = require('./app/models/Token')(sequelize);
 
 const auth = require('./app/routes/auth')(passport, User, Token);
-const user = require('./app/routes/user')(passport);
+const user = require('./app/routes/user')(passport, config);
+const mobile = require('./app/routes/mobile')(config);
 app.use('/', auth);
 app.use('/users', user);
+app.use('/mobile', mobile);
 
 app.listen(8000, function() {
 	console.log('listening on port 8000');

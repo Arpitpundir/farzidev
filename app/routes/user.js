@@ -7,7 +7,9 @@ const s3 = new AWS.S3({
 	region: 'ap-southeast-1'
 });
 
-module.exports = function(passport) {
+const bucket = 'storage.pheoko.com';
+
+module.exports = function(passport, config) {
 	router.use(passport.authenticate('jwt-auth', {
 		session: false
 	}));
@@ -33,10 +35,10 @@ module.exports = function(passport) {
 		const key = req.user.email + '/' + filePath;
 
 		s3.getSignedUrl('putObject', {
-			Bucket: 'storage.pheoko.com',
+			Bucket: bucket,
 			Key: key,
 			Expires: 60 * 60, // seconds
-			ACL: 'bucket-owner-full-control',
+			ACL: 'public-read',
 			ContentType: req.query.contentType
 		}, (err, url) => {
 			if(err) {

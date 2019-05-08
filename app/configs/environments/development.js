@@ -5,5 +5,9 @@ module.exports = {
 		password: 'DevEnv1!',
 		dialect: 'mysql',
 		database: 'pheoko_dev'
+	},
+	aws: {
+		region: 'ap-southeast-1',
+		bucket: 'storage.pheoko.com'
 	}
 };
