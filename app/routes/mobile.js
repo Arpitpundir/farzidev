@@ -10,11 +10,17 @@ module.exports = function(config) {
 
 	const bucket = config.aws.bucket;
 
-	router.get('/ls', (req, res, next) => {
+	router.use((req, res, next) => {
 		if(req.headers['user-agent'].toLowerCase().indexOf('pheoko') < 0) {
 			return res.redirect('http://pheoko.com');
 		}
 
+		else {
+			next();
+		}
+	});
+
+	router.get('/ls', (req, res, next) => {
 		if(!req.query.directory) {
 			return res.send({
 				status: 'err',
@@ -37,6 +43,26 @@ module.exports = function(config) {
 			}
 
 			res.send(data);
+		});
+	});
+
+	router.post('/decision', (req, res, next) => {
+		console.log(req.body);
+
+		const { decision, tag, key } = req.body
+
+		if(!decision || !tag || !key) {
+			return res.send({
+				status: 'err',
+				error: 'Missing required parameters'
+			});
+		}
+
+		res.send({
+			status: 'ok',
+			decision,
+			tag,
+			key
 		});
 	});
 
