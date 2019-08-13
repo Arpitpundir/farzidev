@@ -1,16 +1,28 @@
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 
-module.exports = function(connection) {
-	const Role = connection.define('role', {
-		name: {
-			type: Sequelize.STRING,
-			allowNull: false
-		}
-	}, {
-		freezeTableName: true
-	});
+// module.exports = function(connection) {
+// 	const Role = connection.define('role', {
+// 		name: {
+// 			type: Sequelize.STRING,
+// 			allowNull: false
+// 		}
+// 	}, {
+// 		freezeTableName: true
+// 	});
 
-	Role.sync();
+// 	Role.sync();
 
-	return Role;
-};
+// 	return Role;
+// };
+
+const mongoose = require("mongoose");
+
+const roleSchema = mongoose.Schema({
+	name:{
+		type: String,
+		required: [true, "A role must have a name"]
+	}
+});
+
+const Role = mongoose.model("Role", roleSchema);
+module.exports = Role;
