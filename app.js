@@ -1,11 +1,11 @@
 const express = require("express");
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const User = require('./app/models/User')(sequelize);
-const Organization = require('./app/models/Organization')(sequelize);
-const Role = require('./app/models/Role')(sequelize);
-const UserOrgRole = require('./app/models/UserOrgRole')(sequelize);
-const Token = require('./app/models/Token')(sequelize);
+const User = require('./app/models/User');
+const Organization = require('./app/models/Organization');
+const Role = require('./app/models/Role');
+const UserOrgRole = require('./app/models/UserOrgRole');
+const Token = require('./app/models/Token');
 
 const app = express();
 
